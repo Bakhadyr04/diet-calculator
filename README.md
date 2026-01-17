@@ -1,50 +1,108 @@
-# Welcome to your Expo app 👋
+# Калькулятор средиземноморской диеты
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Мобильное приложение для расчета индекса средиземноморской диеты и других диетических индексов.
 
-## Get started
+## Технологии
 
-1. Install dependencies
+- **Expo SDK 54** (совместимо с Expo Go на iPhone)
+- **React Native 0.81**
+- **TypeScript** для типобезопасности
+- **SQLite** (expo-sqlite) для хранения данных
+- **React Navigation** для навигации между экранами
 
-   ```bash
-   npm install
-   ```
+## Функционал
 
-2. Start the app
+### 1. Регистрация пользователя
+- Форма регистрации с полями:
+  - ФИО
+  - Дата рождения
+  - Телефон
+  - Email
+- Валидация данных
+- Проверка уникальности email
 
-   ```bash
-   npx expo start
-   ```
+### 2. Калькулятор
+- Расчет индекса средиземноморской диеты на основе:
+  - Овощи (порций в день)
+  - Фрукты (порций в день)
+  - Бобовые (порций в неделю)
+  - Злаки (порций в день)
+  - Рыба (порций в неделю)
+  - Мясо (порций в неделю)
+  - Молочные продукты (порций в день)
+  - Алкоголь (бокалов в день)
+  - Оливковое масло (ст.л. в день)
+  - Орехи (порций в неделю)
+- Кнопки "Рассчитать" и "Очистить"
+- Подсказки для каждого поля
 
-In the output, you'll find options to open the app in a
+### 3. История расчетов
+- Просмотр всех выполненных расчетов
+- Отображение даты и времени расчета
+- Отображение индекса
+- Переход к детальному просмотру результата
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 4. Профиль пользователя
+- Отображение данных регистрации
+- Статистика расчетов:
+  - Общее количество расчетов
+  - Средний индекс
+  - Первый и последний расчет
+- Возможность выхода из аккаунта
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Установка и запуск
 
-## Get a fresh project
-
-When you're ready, run:
-
+1. Установите зависимости:
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Запустите приложение:
+```bash
+npm start
+```
 
-## Learn more
+3. Выберите платформу:
+   - Нажмите `a` для Android
+   - Нажмите `i` для iOS
+   - Нажмите `w` для Web
 
-To learn more about developing your project with Expo, look at the following resources:
+## Структура проекта
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
+├── App.tsx                 # Главный файл приложения с навигацией
+├── tsconfig.json           # Конфигурация TypeScript
+├── types/
+│   └── index.ts            # Типы TypeScript
+├── context/
+│   └── UserContext.tsx     # Контекст для управления пользователем
+├── database/
+│   └── database.ts         # Работа с SQLite базой данных
+├── screens/
+│   ├── RegistrationScreen.tsx  # Экран регистрации
+│   ├── CalculatorScreen.tsx    # Экран калькулятора
+│   ├── ResultScreen.tsx         # Экран результата
+│   ├── HistoryScreen.tsx        # Экран истории
+│   └── ProfileScreen.tsx        # Экран профиля
+└── utils/
+    └── calculations.ts         # Логика расчета индекса
+```
 
-## Join the community
+## База данных
 
-Join our community of developers creating universal apps.
+Приложение использует SQLite с тремя основными таблицами:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. **users** - информация о пользователях
+2. **calculations** - история расчетов
+3. **usage_stats** - статистика использования (для будущего функционала)
+
+## Интерпретация результатов
+
+Индекс рассчитывается по шкале от 0 до 100:
+
+- **80-100**: Отличное соответствие средиземноморской диете
+- **60-79**: Хорошее соответствие
+- **40-59**: Удовлетворительное соответствие
+- **0-39**: Требует улучшения
+
+Для каждого уровня предоставляются рекомендации по улучшению рациона.
