@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 
-import { getUserStatistics } from '../../database/database';
+import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
 import { UserStatistics as UserStatsType } from '../../types';
 
@@ -28,7 +28,7 @@ export default function ProfileScreen() {
 
     try {
       setLoading(true);
-      const stats = await getUserStatistics(user.id);
+      const stats = await api.getUserStatistics();
       setStatistics(stats);
     } catch (error) {
       console.error('Error loading statistics:', error);
@@ -47,6 +47,25 @@ export default function ProfileScreen() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const formatBirthDate = (dateString: string): string => {
+    // Парсим дату из формата YYYY-MM-DD без учета часового пояса
+    // чтобы избежать смещения на 1 день
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // месяц начинается с 0
+      const day = parseInt(parts[2], 10);
+      const date = new Date(year, month, day);
+      return date.toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+    }
+    // Если формат другой, пробуем стандартный парсинг
+    return new Date(dateString).toLocaleDateString('ru-RU');
   };
 
   const handleLogout = async (): Promise<void> => {
@@ -88,7 +107,7 @@ export default function ProfileScreen() {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Дата рождения:</Text>
           <Text style={styles.infoValue}>
-            {new Date(user.birth_date).toLocaleDateString('ru-RU')}
+            {formatBirthDate(user.birth_date)}
           </Text>
         </View>
 

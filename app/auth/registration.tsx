@@ -13,7 +13,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 
-import { insertUser, getUserByEmail, getUserById } from '../../database/database';
+import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
 
 export default function RegistrationScreen() {
@@ -30,6 +30,7 @@ export default function RegistrationScreen() {
   });
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const validateEmail = (email: string): boolean => {
@@ -162,34 +163,38 @@ export default function RegistrationScreen() {
       return;
     }
 
+    if (!password || password.length < 8) {
+      Alert.alert('Ошибка', 'Пароль должен содержать минимум 8 символов');
+      return;
+    }
+
     try {
-      const existingUser = await getUserByEmail(email);
-      if (existingUser) {
-        Alert.alert('Ошибка', 'Пользователь с таким email уже существует');
-        return;
-      }
-
       const finalDate = parsedDate || birthDate;
-      const userId = await insertUser(
-        fullName.trim(),
-        finalDate.toISOString().split('T')[0],
-        phone.trim(),
-        email.trim()
-      );
+      // Форматируем дату в YYYY-MM-DD без учета часового пояса
+      const year = finalDate.getFullYear();
+      const month = String(finalDate.getMonth() + 1).padStart(2, '0');
+      const day = String(finalDate.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      
+      const { user } = await api.register({
+        full_name: fullName.trim(),
+        birth_date: dateString,
+        phone: phone.trim(),
+        email: email.trim(),
+        password: password,
+      });
 
-      const userData = await getUserById(userId);
-      if (userData) {
-        await setUserData(userData);
-        Alert.alert('Успех', 'Регистрация завершена успешно!', [
-          {
-            text: 'OK',
-            onPress: () => router.replace('/tabs'),
-          },
-        ]);
-      }
-    } catch (error) {
+      await setUserData(user);
+      Alert.alert('Успех', 'Регистрация завершена успешно!', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/tabs'),
+        },
+      ]);
+    } catch (error: any) {
       console.error('Registration error:', error);
-      Alert.alert('Ошибка', 'Не удалось зарегистрироваться. Попробуйте еще раз.');
+      const errorMessage = error.message || 'Не удалось зарегистрироваться. Попробуйте еще раз.';
+      Alert.alert('Ошибка', errorMessage);
     }
   };
 
@@ -278,6 +283,18 @@ export default function RegistrationScreen() {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Пароль</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Минимум 8 символов"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
               autoCapitalize="none"
             />
           </View>

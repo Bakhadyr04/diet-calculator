@@ -1,21 +1,8 @@
 import { Stack } from 'expo-router';
 import UserProvider from '../context/UserContext';
-import { useEffect } from 'react';
-import { initDatabase } from '../database/database';
-
 
 export default function RootLayout() {
-
-  useEffect(() => {
-    initDatabase()
-      .then(() => {
-        console.log('Database initialized');
-      })
-      .catch((error) => {
-        console.error('Database init error:', error);
-      });
-  }, []);
-
+  // Инициализация БД больше не требуется - используется API
   return (
     <UserProvider>
       <Stack screenOptions={{ headerShown: false }}>

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { getUserById } from '../database/database';
+import { api } from '../api/client';
 import { User } from '../types';
 
 interface UserContextType {
@@ -27,15 +27,17 @@ export default function UserProvider({ children }: UserProviderProps) {
 
   const loadUser = async (): Promise<void> => {
     try {
-      const userId = await AsyncStorage.getItem('userId');
-      if (userId) {
-        const userData = await getUserById(Number(userId));
+      const token = await AsyncStorage.getItem('authToken');
+      if (token) {
+        const userData = await api.getCurrentUser();
         if (userData) {
           setUser(userData);
         }
       }
     } catch (error) {
       console.error('Error loading user:', error);
+      // Если токен невалидный, удаляем его
+      await AsyncStorage.removeItem('authToken');
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +45,7 @@ export default function UserProvider({ children }: UserProviderProps) {
 
   const setUserData = async (userData: User): Promise<void> => {
     try {
-      await AsyncStorage.setItem('userId', userData.id.toString());
+      // Токен уже сохранен в api.register/api.login
       setUser(userData);
     } catch (error) {
       console.error('Error saving user:', error);
@@ -52,7 +54,7 @@ export default function UserProvider({ children }: UserProviderProps) {
 
   const logout = async (): Promise<void> => {
     try {
-      await AsyncStorage.removeItem('userId');
+      await api.logout();
       setUser(null);
     } catch (error) {
       console.error('Error logging out:', error);

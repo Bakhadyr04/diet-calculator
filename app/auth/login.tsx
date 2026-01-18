@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 
-import { getUserByEmail } from '../../database/database';
+import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
 
 export default function LoginScreen() {
@@ -34,13 +34,8 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const user = await getUserByEmail(email.trim());
+      const { user } = await api.login(email.trim());
       
-      if (!user) {
-        Alert.alert('Ошибка', 'Пользователь с таким email не найден');
-        return;
-      }
-
       await setUserData(user);
       Alert.alert('Успех', 'Вход выполнен успешно!', [
         {
@@ -48,9 +43,10 @@ export default function LoginScreen() {
           onPress: () => router.replace('/tabs'),
         },
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      Alert.alert('Ошибка', 'Не удалось войти. Попробуйте еще раз.');
+      const errorMessage = error.message || 'Не удалось войти. Попробуйте еще раз.';
+      Alert.alert('Ошибка', errorMessage);
     } finally {
       setLoading(false);
     }

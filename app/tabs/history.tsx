@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 
-import { getCalculationsByUserId } from '../../database/database';
+import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
 import { Calculation, Interpretation, CalculatorAnswers } from '../../types';
 
@@ -25,7 +25,7 @@ export default function HistoryScreen() {
 
     try {
       setLoading(true);
-      const data = await getCalculationsByUserId(user.id);
+      const data = await api.getCalculations();
       setCalculations(data);
     } catch (error) {
       console.error('Error loading calculations:', error);

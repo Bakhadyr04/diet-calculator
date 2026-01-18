@@ -10,8 +10,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 
-import { calculateMediterraneanDietIndex, interpretScore } from '../../utils/calculations';
-import { insertCalculation } from '../../database/database';
+import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
 import { CalculatorAnswers } from '../../types';
 
@@ -151,26 +150,19 @@ const CalculatorScreen: React.FC = () => {
     }
 
     try {
-      const score = calculateMediterraneanDietIndex(numericAnswers);
-      const interpretation = interpretScore(score);
-
-      await insertCalculation(
-        user.id,
-        score,
-        JSON.stringify(interpretation),
-        numericAnswers
-      );
+      const result = await api.createCalculation(numericAnswers);
 
       router.push({
         pathname: '/result',
         params: {
-          score: score.toString(),
-          interpretation: JSON.stringify(interpretation),
+          score: result.score.toString(),
+          interpretation: JSON.stringify(result.interpretation),
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Calculation error:', error);
-      Alert.alert('Ошибка', 'Не удалось выполнить расчет. Попробуйте еще раз.');
+      const errorMessage = error.message || 'Не удалось выполнить расчет. Попробуйте еще раз.';
+      Alert.alert('Ошибка', errorMessage);
     }
   };
 
