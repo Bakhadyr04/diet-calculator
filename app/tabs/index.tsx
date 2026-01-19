@@ -13,6 +13,7 @@ import { router } from 'expo-router';
 import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
 import { CalculatorAnswers } from '../../types';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface AnswerFields {
   vegetables: string;
@@ -197,6 +198,11 @@ const CalculatorScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={{ backgroundColor: "#f5f5f5", padding: 16, borderRadius: 16, alignItems: "center" }}>
+          <MaterialCommunityIcons name="hand-heart-outline" size={50} color="#007AFF" />
+        </View>
+
+
         <Text style={styles.title}>
           Калькулятор средиземноморской диеты
         </Text>
@@ -250,7 +256,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 8,
@@ -258,7 +264,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#888888',
     paddingBottom: 30,
     textAlign: 'center',
   },
@@ -274,14 +280,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   label: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: '#2c3e50',
     marginBottom: 4,
   },
   hint: {
-    fontSize: 12,
-    color: '#95a5a6',
+    fontSize: 13,
+    color: '#888888',
     marginBottom: 8,
   },
   input: {

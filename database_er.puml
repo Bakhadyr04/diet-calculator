@@ -1,0 +1,33 @@
+@startuml
+title Структура базы данных HAS-BLED Calculator
+
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor White
+  BorderColor Black
+}
+
+entity Users {
+  id : UUID <<PK>>
+  --
+  email : VARCHAR
+  password_hash : VARCHAR
+  full_name : VARCHAR
+  created_at : TIMESTAMP
+}
+
+entity Calculations {
+  id : UUID <<PK>>
+  --
+  user_id : UUID <<FK>>
+  factors : JSON
+  total_score : INTEGER
+  risk_level : VARCHAR
+  risk_percentage : VARCHAR
+  interpretation : TEXT
+  created_at : TIMESTAMP
+}
+
+Users ||--o{ Calculations : "1 user → many calculations"
+
+@enduml

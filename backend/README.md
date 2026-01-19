@@ -146,3 +146,21 @@ Authorization: Bearer <token>
 ```
 DATABASE_URL=postgresql://user:password@localhost/diet_calculator
 ```
+
+## Интеграция с GigaChat
+
+Приложение использует GigaChat API для анализа диеты и генерации персонализированных рекомендаций.
+
+### Настройка GigaChat
+
+1. Получите API токен на [developers.sber.ru](https://developers.sber.ru/)
+2. Добавьте в `.env`:
+```
+GIGACHAT_CREDENTIALS=your-token-here
+```
+
+3. Перезапустите бэкенд
+
+Подробная инструкция в файле `GIGACHAT_SETUP.md`
+
+**Примечание:** Если GigaChat API недоступен, система автоматически использует локальный алгоритм расчета.

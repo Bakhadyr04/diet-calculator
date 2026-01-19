@@ -66,3 +66,16 @@ def read_user(
             detail="User not found"
         )
     return db_user
+
+
+@router.get("/admin/statistics", response_model=schemas.SystemStatistics)
+def get_system_statistics(
+    current_user: models.User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """
+    Получение системной статистики использования приложения.
+    Интеграция для сбора и анализа данных (Задание 7).
+    Доступно только администраторам.
+    """
+    return crud.get_system_statistics(db)

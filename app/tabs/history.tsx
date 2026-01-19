@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#888888',
     paddingHorizontal: 20,
     paddingBottom: 15,
     textAlign: 'center',
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
   scoreText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   dateText: { fontSize: 14, color: '#7f8c8d' },
   itemSubtext: {
-    fontSize: 12,
-    color: '#95a5a6',
+    fontSize: 13,
+    color: '#888888',
     fontStyle: 'italic',
   },
   emptyContainer: {
@@ -197,13 +197,13 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#888888',
     textAlign: 'center',
     marginBottom: 24,
   },
   loadingText: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#888888',
     textAlign: 'center',
     marginTop: 40,
   },

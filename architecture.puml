@@ -1,0 +1,72 @@
+@startuml
+title Архитектура приложения HAS-BLED Calculator
+
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+' ===== УРОВЕНЬ ПРЕДСТАВЛЕНИЯ =====
+package "Уровень представления\n(Mobile App – React Native + Expo)" {
+
+  component LoginScreen
+  component CalculatorScreen
+  component HistoryScreen
+  component ProfileScreen
+
+  component AuthContext
+  component ThemeContext
+  component APIService
+
+  LoginScreen --> AuthContext
+  CalculatorScreen --> AuthContext
+  CalculatorScreen --> ThemeContext
+  HistoryScreen --> AuthContext
+  ProfileScreen --> AuthContext
+
+  LoginScreen --> APIService
+  CalculatorScreen --> APIService
+  HistoryScreen --> APIService
+  ProfileScreen --> APIService
+}
+
+' ===== УРОВЕНЬ БИЗНЕС-ЛОГИКИ =====
+package "Уровень бизнес-логики\n(Backend – Django REST Framework)" {
+
+  package "Views (API)" {
+    component AuthViewSet
+    component CalculationViewSet
+  }
+
+  package "Services" {
+    component HASBLEDCalculator
+    component GigaChatService
+  }
+
+  package "Serializers + Models" {
+    component User
+    component Calculation
+  }
+
+  AuthViewSet --> User
+  CalculationViewSet --> HASBLEDCalculator : calculates score
+  CalculationViewSet --> GigaChatService : generates interpretation
+
+  HASBLEDCalculator --> Calculation : updates total_score
+  GigaChatService --> Calculation : updates interpretation
+}
+
+' ===== УРОВЕНЬ ДАННЫХ =====
+package "Уровень данных\n(PostgreSQL)" {
+
+  component UsersTable
+  component CalculationsTable
+
+  UsersTable --> CalculationsTable : "1 user → many calculations"
+}
+
+' ===== СВЯЗИ МЕЖДУ УРОВНЯМИ =====
+APIService --> AuthViewSet : HTTPS / JSON
+APIService --> CalculationViewSet : HTTPS / JSON
+
+User --> UsersTable : persists
+Calculation --> CalculationsTable : persists
+@enduml

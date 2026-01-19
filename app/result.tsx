@@ -14,15 +14,18 @@ export default function ResultScreen() {
   const params = useLocalSearchParams();
 
   const score =
-    typeof params.score === 'string' ? Number(params.score) : null;
+    typeof params.score === 'string'
+      ? Number(params.score)
+      : null;
 
-  let interpretation: Interpretation | null = null;
+  let parsedInterpretation: Interpretation | null = null;
 
   if (typeof params.interpretation === 'string') {
     try {
-      interpretation = JSON.parse(params.interpretation);
-    } catch {
-      interpretation = null;
+      parsedInterpretation = JSON.parse(params.interpretation);
+    } catch (error) {
+      console.error('Ошибка парсинга interpretation:', error);
+      parsedInterpretation = null;
     }
   }
 
@@ -33,16 +36,20 @@ export default function ResultScreen() {
     return '#e74c3c';
   };
 
-  if (score === null || !interpretation) {
+  if (score === null || !parsedInterpretation) {
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Ошибка: данные не найдены</Text>
+          <Text style={styles.errorText}>
+            Ошибка: данные не найдены
+          </Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => router.replace('/tabs')}
           >
-            <Text style={styles.buttonText}>Вернуться к калькулятору</Text>
+            <Text style={styles.buttonText}>
+              Вернуться к калькулятору
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -53,7 +60,9 @@ export default function ResultScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.resultCard}>
-          <Text style={styles.resultTitle}>Результат расчета</Text>
+          <Text style={styles.resultTitle}>
+            Результат расчета
+          </Text>
 
           <View
             style={[
@@ -76,22 +85,32 @@ export default function ResultScreen() {
 
           <View style={styles.interpretationContainer}>
             <Text style={styles.interpretationTitle}>
-              Оценка: {interpretation.level}
+              Оценка: {parsedInterpretation.level}
             </Text>
+
             <Text style={styles.interpretationDescription}>
-              {interpretation.description}
+              {parsedInterpretation.description}
             </Text>
 
             <Text style={styles.recommendationsTitle}>
               Рекомендации:
             </Text>
 
-            {interpretation.recommendations.map((rec, index) => (
-              <View key={index} style={styles.recommendationItem}>
-                <Text style={styles.recommendationBullet}>•</Text>
-                <Text style={styles.recommendationText}>{rec}</Text>
-              </View>
-            ))}
+            {parsedInterpretation.recommendations.map(
+              (rec, index) => (
+                <View
+                  key={index}
+                  style={styles.recommendationItem}
+                >
+                  <Text style={styles.recommendationBullet}>
+                    •
+                  </Text>
+                  <Text style={styles.recommendationText}>
+                    {rec}
+                  </Text>
+                </View>
+              )
+            )}
           </View>
 
           <View style={styles.buttonContainer}>
@@ -99,15 +118,23 @@ export default function ResultScreen() {
               style={styles.button}
               onPress={() => router.replace('/tabs')}
             >
-              <Text style={styles.buttonText}>Новый расчет</Text>
+              <Text style={styles.buttonText}>
+                Новый расчет
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, styles.secondaryButton]}
+              style={[
+                styles.button,
+                styles.secondaryButton,
+              ]}
               onPress={() => router.push('/tabs/history')}
             >
               <Text
-                style={[styles.buttonText, styles.secondaryButtonText]}
+                style={[
+                  styles.buttonText,
+                  styles.secondaryButtonText,
+                ]}
               >
                 История расчетов
               </Text>
@@ -120,8 +147,14 @@ export default function ResultScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  scrollContent: { padding: 20, paddingTop: 100, },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  scrollContent: {
+    padding: 20,
+    paddingTop: 100,
+  },
   resultCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -148,8 +181,13 @@ const styles = StyleSheet.create({
     color: '#7f8c8d',
     marginBottom: 8,
   },
-  scoreValue: { fontSize: 48, fontWeight: 'bold' },
-  interpretationContainer: { marginBottom: 24 },
+  scoreValue: {
+    fontSize: 48,
+    fontWeight: 'bold',
+  },
+  interpretationContainer: {
+    marginBottom: 24,
+  },
   interpretationTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -168,7 +206,10 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
     marginBottom: 12,
   },
-  recommendationItem: { flexDirection: 'row', marginBottom: 8 },
+  recommendationItem: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
   recommendationBullet: {
     fontSize: 16,
     color: '#3498db',
@@ -180,7 +221,9 @@ const styles = StyleSheet.create({
     color: '#34495e',
     lineHeight: 22,
   },
-  buttonContainer: { gap: 12 },
+  buttonContainer: {
+    gap: 12,
+  },
   button: {
     backgroundColor: '#3498db',
     borderRadius: 8,
@@ -192,8 +235,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#3498db',
   },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
-  secondaryButtonText: { color: '#3498db' },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#3498db',
+  },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',

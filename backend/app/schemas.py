@@ -95,3 +95,26 @@ class UserStatistics(BaseModel):
 class CalculationResult(BaseModel):
     score: float
     interpretation: Interpretation
+
+
+# System Statistics Schemas (для интеграции - Задание 7)
+class ScoreDistribution(BaseModel):
+    """Распределение индексов по категориям"""
+    excellent: int = 0  # 80-100
+    good: int = 0  # 60-79
+    satisfactory: int = 0  # 40-59
+    needs_improvement: int = 0  # 0-39
+
+
+class SystemStatistics(BaseModel):
+    """Системная статистика использования приложения"""
+    total_users: int
+    active_users: int  # Пользователи с хотя бы одним расчетом
+    total_calculations: int
+    average_score: Optional[float] = None
+    score_distribution: ScoreDistribution
+    calculations_today: int
+    calculations_this_week: int
+    calculations_this_month: int
+    first_calculation_date: Optional[datetime] = None
+    last_calculation_date: Optional[datetime] = None
