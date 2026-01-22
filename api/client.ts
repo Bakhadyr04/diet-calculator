@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { User, Calculation, UserStatistics, CalculatorAnswers, Interpretation } from '../types';
 
 // Пример: если ваш IP адрес 192.168.1.100, установите:
-const YOUR_COMPUTER_IP = '192.168.0.104'; // ⚠️ ЗАМЕНИТЕ НА ВАШ IP!
+const YOUR_COMPUTER_IP = '192.168.0.103'; // ⚠️ ЗАМЕНИТЕ НА ВАШ IP!
 
 // Определение базового URL API
 const getApiBaseUrl = (): string => {
@@ -136,7 +136,7 @@ export const api = {
         await saveToken(loginData.access_token);
       }
       return { user: loginData.user, access_token: loginData.access_token };
-    } catch (error) {
+    } catch {
       // Если вход не удался, возвращаем пользователя без токена
       // Пользователю нужно будет войти вручную
       return { user, access_token: '' };

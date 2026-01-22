@@ -202,7 +202,6 @@ const CalculatorScreen: React.FC = () => {
           <MaterialCommunityIcons name="hand-heart-outline" size={50} color="#007AFF" />
         </View>
 
-
         <Text style={styles.title}>
           Калькулятор средиземноморской диеты
         </Text>

@@ -8,6 +8,14 @@
     "name": "diet-calculator",
     "slug": "diet-calculator",
     "scheme": "dietcalculator",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "772482d5-ab67-4e8b-b44f-4c15c5646263"
+      }
+    },
+    "android": {
+      "package": "com.bakhadyr.dietcalculator"
+    }
   }
 }

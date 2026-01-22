@@ -9,6 +9,7 @@ import {
 import { router } from 'expo-router';
 import { useUserContext } from '../context/UserContext';
 import { Redirect } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function Index() {
   const { user, isLoading } = useUserContext();
@@ -25,6 +26,9 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        <View style={{ backgroundColor: "#f5f5f5", padding: 16, borderRadius: 16, alignItems: "center" }}>
+            <MaterialCommunityIcons name="hand-heart-outline" size={50} color="#007AFF" />
+        </View>
         <Text style={styles.title}>Калькулятор средиземноморской диеты</Text>
         <Text style={styles.subtitle}>
           Рассчитайте индекс вашего рациона питания
