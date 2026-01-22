@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from .database import engine, Base
 from .config import settings
-from .routers import auth, users, calculations
+from .routers import auth, users, calculations, drafts
 
 # Создание таблиц в БД
 Base.metadata.create_all(bind=engine)
@@ -51,6 +51,7 @@ async def options_handler(full_path: str, request: Request):
 app.include_router(auth.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(calculations.router, prefix="/api")
+app.include_router(drafts.router, prefix="/api")
 
 
 @app.get("/")

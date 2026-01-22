@@ -97,6 +97,32 @@ def get_calculation(
     )
 
 
+@router.delete("/{calculation_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_calculation(
+    calculation_id: int,
+    current_user: models.User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Удаление расчета по ID"""
+    db_calculation = crud.get_calculation_by_id(db, calculation_id)
+    if db_calculation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Calculation not found"
+        )
+    
+    # Проверка прав доступа
+    if db_calculation.user_id != current_user.id and current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions"
+        )
+    
+    db.delete(db_calculation)
+    db.commit()
+    return None
+
+
 # Admin endpoints
 @router.get("/admin/all", response_model=List[schemas.CalculationResponse])
 def get_all_calculations(

@@ -9,6 +9,7 @@ import {
   ListRenderItem,
 } from 'react-native';
 import { router } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { api } from '../../api/client';
 import { useUserContext } from '../../context/UserContext';
@@ -74,22 +75,60 @@ export default function HistoryScreen() {
     }
   };
 
+  const handleDelete = async (item: Calculation, event: any): Promise<void> => {
+    event.stopPropagation();
+    
+    Alert.alert(
+      'Удаление отчета',
+      'Вы уверены, что хотите удалить этот отчет?',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        {
+          text: 'Удалить',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.deleteCalculation(item.id);
+              // Обновляем список после удаления
+              const data = await api.getCalculations();
+              setCalculations(data);
+              Alert.alert('Успех', 'Отчет удален');
+            } catch (error) {
+              console.error('Error deleting calculation:', error);
+              Alert.alert('Ошибка', 'Не удалось удалить отчет');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const renderItem: ListRenderItem<Calculation> = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
       <View style={styles.itemHeader}>
-        <View
-          style={[
-            styles.scoreBadge,
-            { backgroundColor: getScoreColor(item.score) },
-          ]}
-        >
-          <Text style={styles.scoreText}>{item.score}</Text>
+        <View style={styles.itemHeaderLeft}>
+          <View
+            style={[
+              styles.scoreBadge,
+              { backgroundColor: getScoreColor(item.score) },
+            ]}
+          >
+            <Text style={styles.scoreText}>{item.score}</Text>
+          </View>
+          <View style={styles.itemInfo}>
+            <Text style={styles.dateText}>{formatDate(item.created_at)}</Text>
+            <Text style={styles.itemSubtext}>
+              Нажмите для просмотра деталей
+            </Text>
+          </View>
         </View>
-        <Text style={styles.dateText}>{formatDate(item.created_at)}</Text>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={(e) => handleDelete(item, e)}
+        >
+          <MaterialCommunityIcons name="delete-outline" size={24} color="#e74c3c" />
+        </TouchableOpacity>
       </View>
-      <Text style={styles.itemSubtext}>
-        Нажмите для просмотра деталей
-      </Text>
     </TouchableOpacity>
   );
 
@@ -167,7 +206,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+  },
+  itemHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
   },
   scoreBadge: {
     borderRadius: 20,
@@ -177,11 +221,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scoreText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  dateText: { fontSize: 14, color: '#7f8c8d' },
+  itemInfo: {
+    flex: 1,
+  },
+  dateText: { fontSize: 14, color: '#7f8c8d', marginBottom: 4 },
   itemSubtext: {
     fontSize: 13,
     color: '#888888',
     fontStyle: 'italic',
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
   emptyContainer: {
     flex: 1,

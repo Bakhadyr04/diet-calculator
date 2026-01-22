@@ -1,8 +1,14 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_, case
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
+
+
+def get_moscow_time() -> datetime:
+    """Получение текущего времени в московском часовом поясе (UTC+3)"""
+    moscow_tz = timezone(timedelta(hours=3))
+    return datetime.now(moscow_tz)
 
 from . import models, schemas
 from .utils.calculations import (
@@ -40,6 +46,7 @@ def create_user(db: Session, user: schemas.UserCreate) -> models.User:
         phone=user.phone,
         email=user.email,
         hashed_password=hashed_password,
+        created_at=get_moscow_time(),
     )
 
     db.add(db_user)
@@ -109,7 +116,7 @@ def create_calculation(
             calculation.answers.model_dump(),
             ensure_ascii=False
         ),
-        created_at=datetime.utcnow(),
+        created_at=get_moscow_time(),
     )
 
     db.add(db_calculation)
@@ -122,17 +129,17 @@ def _build_gigachat_prompt(answers: schemas.CalculatorAnswers) -> str:
     return f"""
 Ты — профессиональный диетолог, эксперт по средиземноморской диете.
 
-Данные пользователя:
-- Овощи: {answers.vegetables} порций/день
-- Фрукты: {answers.fruits} порций/день
-- Бобовые: {answers.legumes} порций/неделю
-- Злаки: {answers.cereals} порций/день
-- Рыба: {answers.fish} порций/неделю
-- Мясо: {answers.meat} порций/неделю
-- Молочные продукты: {answers.dairy} порций/день
-- Алкоголь: {answers.alcohol} бокалов/день
-- Оливковое масло: {answers.oliveOil} ложек/день
-- Орехи: {answers.nuts} порций/неделю
+Данные пользователя за неделю:
+- Овощи: {answers.vegetables} порций/неделю (норма: 35 порций/неделю)
+- Фрукты: {answers.fruits} порций/неделю (норма: 35 порций/неделю)
+- Бобовые: {answers.legumes} порций/неделю (норма: 3 порций/неделю)
+- Злаки: {answers.cereals} порций/неделю (норма: 35 порций/неделю)
+- Рыба: {answers.fish} порций/неделю (норма: 3 порций/неделю)
+- Мясо: {answers.meat} порций/неделю (норма: менее 2 порций/неделю, меньше лучше)
+- Молочные продукты: {answers.dairy} порций/неделю (норма: 14 порций/неделю)
+- Алкоголь: {answers.alcohol} бокалов/неделю (норма: 14 бокалов/неделю)
+- Оливковое масло: {answers.oliveOil} столовых ложек/неделю (норма: 28 ст.л./неделю)
+- Орехи: {answers.nuts} порций/неделю (норма: 3 порций/неделю)
 
 Верни СТРОГО JSON без markdown:
 
@@ -227,6 +234,61 @@ def get_all_calculations(
 # System Statistics
 # ======================
 
+# ======================
+# Draft CRUD
+# ======================
+
+def get_draft_by_user_id(db: Session, user_id: int) -> Optional[models.Draft]:
+    """Получение черновика пользователя"""
+    return db.query(models.Draft).filter(models.Draft.user_id == user_id).first()
+
+
+def create_or_update_draft(
+    db: Session,
+    user_id: int,
+    draft: schemas.DraftCreate,
+) -> models.Draft:
+    """Создание или обновление черновика"""
+    existing_draft = get_draft_by_user_id(db, user_id)
+    
+    if existing_draft:
+        # Обновляем существующий черновик
+        existing_draft.draft_data = json.dumps(
+            draft.answers.model_dump(), ensure_ascii=False
+        )
+        existing_draft.updated_at = get_moscow_time()
+        db.commit()
+        db.refresh(existing_draft)
+        return existing_draft
+    else:
+        # Создаем новый черновик
+        db_draft = models.Draft(
+            user_id=user_id,
+            draft_data=json.dumps(
+                draft.answers.model_dump(), ensure_ascii=False
+            ),
+            updated_at=get_moscow_time(),
+        )
+        db.add(db_draft)
+        db.commit()
+        db.refresh(db_draft)
+        return db_draft
+
+
+def delete_draft(db: Session, user_id: int) -> bool:
+    """Удаление черновика пользователя"""
+    draft = get_draft_by_user_id(db, user_id)
+    if draft:
+        db.delete(draft)
+        db.commit()
+        return True
+    return False
+
+
+# ======================
+# System Statistics (Интеграция - Задание 7)
+# ======================
+
 def get_system_statistics(db: Session) -> schemas.SystemStatistics:
     total_users = db.query(func.count(models.User.id)).scalar() or 0
 
@@ -262,7 +324,7 @@ def get_system_statistics(db: Session) -> schemas.SystemStatistics:
         needs_improvement=score_distribution[3] or 0,
     )
 
-    now = datetime.utcnow()
+    now = get_moscow_time()
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     return schemas.SystemStatistics(

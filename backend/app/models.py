@@ -1,9 +1,15 @@
 from sqlalchemy import Column, Integer, String, Float, Text, DateTime, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import enum
 from .database import Base
+
+
+def get_moscow_time() -> datetime:
+    """Получение текущего времени в московском часовом поясе (UTC+3)"""
+    moscow_tz = timezone(timedelta(hours=3))
+    return datetime.now(moscow_tz)
 
 
 class UserRole(str, enum.Enum):
@@ -22,10 +28,11 @@ class User(Base):
     email = Column(String, unique=True, nullable=False, index=True)
     hashed_password = Column(String, nullable=True)  # Для будущей аутентификации
     role = Column(SQLEnum(UserRole), default=UserRole.USER, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), nullable=False)
     
     # Связи
     calculations = relationship("Calculation", back_populates="user", cascade="all, delete-orphan")
+    drafts = relationship("Draft", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, role={self.role})>"
@@ -40,10 +47,26 @@ class Calculation(Base):
     score = Column(Float, nullable=False)
     interpretation = Column(Text, nullable=False)  # JSON строка
     calculation_data = Column(Text, nullable=False)  # JSON строка с ответами
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), nullable=False)
     
     # Связи
     user = relationship("User", back_populates="calculations")
     
     def __repr__(self):
         return f"<Calculation(id={self.id}, user_id={self.user_id}, score={self.score})>"
+
+
+class Draft(Base):
+    """Модель черновика анкеты"""
+    __tablename__ = "drafts"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    draft_data = Column(Text, nullable=False)  # JSON строка с ответами
+    updated_at = Column(DateTime(timezone=True), nullable=False)
+    
+    # Связи
+    user = relationship("User", back_populates="drafts")
+    
+    def __repr__(self):
+        return f"<Draft(id={self.id}, user_id={self.user_id})>"

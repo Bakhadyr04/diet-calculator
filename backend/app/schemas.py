@@ -49,17 +49,18 @@ class Token(BaseModel):
 
 
 # Calculation Schemas
+# Все значения теперь в неделю
 class CalculatorAnswers(BaseModel):
-    vegetables: float = Field(..., ge=0, le=5)
-    fruits: float = Field(..., ge=0, le=5)
-    legumes: float = Field(..., ge=0, le=3)
-    cereals: float = Field(..., ge=0, le=5)
-    fish: float = Field(..., ge=0, le=3)
-    meat: float = Field(..., ge=0, le=2)
-    dairy: float = Field(..., ge=0, le=2)
-    alcohol: float = Field(..., ge=0, le=2)
-    oliveOil: float = Field(..., ge=0, le=4)
-    nuts: float = Field(..., ge=0, le=3)
+    vegetables: float = Field(..., ge=0, le=35)  # 5 порций/день * 7 дней = 35
+    fruits: float = Field(..., ge=0, le=35)  # 5 порций/день * 7 дней = 35
+    legumes: float = Field(..., ge=0, le=3)  # порций в неделю
+    cereals: float = Field(..., ge=0, le=35)  # 5 порций/день * 7 дней = 35
+    fish: float = Field(..., ge=0, le=3)  # порций в неделю
+    meat: float = Field(..., ge=0, le=2)  # порций в неделю (меньше лучше)
+    dairy: float = Field(..., ge=0, le=14)  # 2 порций/день * 7 дней = 14
+    alcohol: float = Field(..., ge=0, le=14)  # 2 бокала/день * 7 дней = 14
+    oliveOil: float = Field(..., ge=0, le=28)  # 4 ст.л./день * 7 дней = 28
+    nuts: float = Field(..., ge=0, le=3)  # порций в неделю
 
 
 class Interpretation(BaseModel):
@@ -118,3 +119,17 @@ class SystemStatistics(BaseModel):
     calculations_this_month: int
     first_calculation_date: Optional[datetime] = None
     last_calculation_date: Optional[datetime] = None
+
+
+# Draft Schemas
+class DraftCreate(BaseModel):
+    answers: CalculatorAnswers
+
+
+class DraftResponse(BaseModel):
+    id: int
+    user_id: int
+    draft_data: CalculatorAnswers
+    updated_at: datetime
+    
+    model_config = {"from_attributes": True}

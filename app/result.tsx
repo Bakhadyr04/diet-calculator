@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
-import { Interpretation } from '../types';
+import { Interpretation, CalculatorAnswers } from '../types';
 
 export default function ResultScreen() {
   const params = useLocalSearchParams();
@@ -19,6 +19,7 @@ export default function ResultScreen() {
       : null;
 
   let parsedInterpretation: Interpretation | null = null;
+  let parsedAnswers: CalculatorAnswers | null = null;
 
   if (typeof params.interpretation === 'string') {
     try {
@@ -26,6 +27,15 @@ export default function ResultScreen() {
     } catch (error) {
       console.error('Ошибка парсинга interpretation:', error);
       parsedInterpretation = null;
+    }
+  }
+
+  if (typeof params.answers === 'string') {
+    try {
+      parsedAnswers = JSON.parse(params.answers);
+    } catch (error) {
+      console.error('Ошибка парсинга answers:', error);
+      parsedAnswers = null;
     }
   }
 
@@ -112,6 +122,56 @@ export default function ResultScreen() {
               )
             )}
           </View>
+
+          {parsedAnswers && (
+            <View style={styles.answersContainer}>
+              <Text style={styles.answersTitle}>
+                Введенные данные:
+              </Text>
+              <View style={styles.answersGrid}>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Овощи:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.vegetables} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Фрукты:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.fruits} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Бобовые:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.legumes} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Злаки:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.cereals} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Рыба:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.fish} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Мясо:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.meat} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Молочные продукты:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.dairy} порций/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Алкоголь:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.alcohol} бокалов/неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Оливковое масло:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.oliveOil} ст.л./неделю</Text>
+                </View>
+                <View style={styles.answerRow}>
+                  <Text style={styles.answerLabel}>Орехи:</Text>
+                  <Text style={styles.answerValue}>{parsedAnswers.nuts} порций/неделю</Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -254,5 +314,37 @@ const styles = StyleSheet.create({
     color: '#e74c3c',
     marginBottom: 20,
     textAlign: 'center',
+  },
+  answersContainer: {
+    marginBottom: 24,
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+  },
+  answersTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 12,
+  },
+  answersGrid: {
+    gap: 8,
+  },
+  answerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  answerLabel: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    flex: 1,
+  },
+  answerValue: {
+    fontSize: 14,
+    color: '#2c3e50',
+    fontWeight: '600',
   },
 });

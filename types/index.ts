@@ -47,6 +47,14 @@ export interface UserStatistics {
   average_score: number | null;
 }
 
+// Типы для черновика
+export interface Draft {
+  id: number;
+  user_id: number;
+  draft_data: CalculatorAnswers;
+  updated_at: string;
+}
+
 // Типы для навигации
 export type RootStackParamList = {
   Registration: undefined;

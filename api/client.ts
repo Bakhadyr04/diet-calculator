@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { User, Calculation, UserStatistics, CalculatorAnswers, Interpretation } from '../types';
+import { User, Calculation, UserStatistics, CalculatorAnswers, Interpretation, Draft } from '../types';
 
 // Пример: если ваш IP адрес 192.168.1.100, установите:
 const YOUR_COMPUTER_IP = '192.168.0.103'; // ⚠️ ЗАМЕНИТЕ НА ВАШ IP!
@@ -207,6 +207,59 @@ export const api = {
       calculation_data: JSON.stringify(data.calculation_data),
       created_at: data.created_at,
     };
+  },
+
+  async deleteCalculation(id: number): Promise<void> {
+    await fetchApi(`/calculations/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Черновики
+  async getDraft(): Promise<Draft | null> {
+    try {
+      const response = await fetchApi('/drafts/');
+      const data = await response.json();
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        draft_data: data.draft_data,
+        updated_at: data.updated_at,
+      };
+    } catch (error: any) {
+      if (error.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
+  async saveDraft(answers: CalculatorAnswers): Promise<Draft> {
+    const response = await fetchApi('/drafts/', {
+      method: 'POST',
+      body: JSON.stringify({ answers }),
+    });
+    const data = await response.json();
+    return {
+      id: data.id,
+      user_id: data.user_id,
+      draft_data: data.draft_data,
+      updated_at: data.updated_at,
+    };
+  },
+
+  async deleteDraft(): Promise<void> {
+    try {
+      await fetchApi('/drafts/', {
+        method: 'DELETE',
+      });
+    } catch (error: any) {
+      // Если черновика нет (404), это нормально - не выбрасываем ошибку
+      if (error.status === 404) {
+        return;
+      }
+      throw error;
+    }
   },
 };
 
